@@ -325,6 +325,13 @@ if HAS_SQLITE3 || HAS_MYSQL || HAS_POSTGRES
           dragon.name.should == 'George'
         end
       end
+
+      describe "empty collection as argument" do
+        it "should not break when an empty collection is given in a query" do
+          dragon = Dragon.all(:id => []).aggregate(:id)
+          dragon.should be_empty
+        end
+      end
     end
   end
 end

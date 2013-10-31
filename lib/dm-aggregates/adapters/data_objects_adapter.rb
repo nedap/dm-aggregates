@@ -2,6 +2,7 @@ module DataMapper
   module Adapters
     class DataObjectsAdapter
       def aggregate(query)
+        return [] if contains_empty_collection_in_equality_condition?(query)
         with_reader(read_statement(query), query.bind_values) do |reader|
           results = []
 
@@ -22,6 +23,15 @@ module DataMapper
       end
 
       private
+      def contains_empty_collection_in_equality_condition?( query )
+        query.conditions.any? do |condition|
+          # condition is made as array
+          # [ operand, property, value ]
+          operand = condition.first
+          value = condition.last
+          (operand == :eql || operand == :in) && value == []
+        end
+      end
 
       def count(property, value)
         value.to_i
